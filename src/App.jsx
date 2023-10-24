@@ -8,19 +8,36 @@ const App = () => {
     setNewName(event.target.value);
   };
 
-  const addPerson = (event) => {
+  // const addPerson = (event) => {
+  //   event.preventDefault();
+  //   console.log("New Name add person", newName);
+
+  //   const personObj = {
+  //     name: newName,
+  //   };
+  //   setPersons(persons.concat(personObj));
+  //   setNewName("");
+  // };
+
+  const addPerson2 = (event) => {
     event.preventDefault();
-    console.log("New Name add person", newName);
-    const personObj = {
-      name: newName,
-    };
-    setPersons(persons.concat(personObj));
-    setNewName("");
+
+    // Check if a person with the same name already exists
+    if (persons.some((person) => person.name === newName)) {
+      alert(`${newName} is already in the phonebook. Not allowed.`);
+    } else {
+      const personObj = {
+        name: newName,
+      };
+
+      setPersons(persons.concat(personObj));
+      setNewName("");
+    }
   };
   return (
     <div>
       <h2>Phonebook</h2>
-      <form onSubmit={addPerson}>
+      <form onSubmit={addPerson2}>
         <div>
           name: <input value={newName} onChange={handleNameChange} />
         </div>
