@@ -12,13 +12,11 @@ const App = () => {
   const [filter, setFilter] = useState("");
 
   useEffect(() => {
-    console.log("effect");
     phoneBookService.getAll().then((initialrecords) => {
       setPersons(initialrecords);
     });
   }, []);
 
-  console.log("render", persons.length, "persons");
   const handleNameChange = (event) => {
     setNewName(event.target.value);
   };
@@ -30,23 +28,6 @@ const App = () => {
   const handleFilterChange = (event) => {
     setFilter(event.target.value);
   };
-
-  // const addPerson2 = (event) => {
-  //   event.preventDefault();
-  //   // Check if a person with the same name already exists
-  //   if (persons.some((person) => person.name === newName)) {
-  //     alert(`${newName} is already in the phonebook. Not allowed.`);
-  //   } else {
-  //     const personObj = {
-  //       name: newName,
-  //       number: newNumber,
-  //     };
-
-  //     setPersons(persons.concat(personObj));
-  //     setNewName("");
-  //     setNewNumber("");
-  //   }
-  // };
 
   const addPerson2 = (event) => {
     event.preventDefault();
@@ -72,6 +53,21 @@ const App = () => {
     person.name.toLowerCase().includes(filter.toLowerCase())
   );
 
+  const deleteEntry = (id) => {
+    const p = persons.filter((person) => person.id === id);
+    const p_name = p[0]["name"];
+
+    window.confirm(`Delete ${p_name}`);
+    phoneBookService
+      .deletePhoneRecord(id)
+      .then(() => {
+        setPersons(persons.filter((person) => person.id !== id));
+      })
+      .catch((error) => {
+        console.log("Error deleting entry:", error);
+      });
+  };
+
   return (
     <div>
       <h2>Phonebook</h2>
@@ -85,7 +81,7 @@ const App = () => {
         handleNumberChange={handleNumberChange}
       />
       <h2>Numbers</h2>
-      <Persons filteredPersons={filteredPersons} />
+      <Persons filteredPersons={filteredPersons} deleteEntry={deleteEntry} />
     </div>
   );
 };
