@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+
 import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
 import Persons from "./components/Persons";
+import phoneBookService from "./services/phoneBookService";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -12,11 +13,11 @@ const App = () => {
 
   useEffect(() => {
     console.log("effect");
-    axios.get("http://localhost:3001/persons").then((response) => {
-      console.log("promise fulfilled");
-      setPersons(response.data);
+    phoneBookService.getAll().then((initialrecords) => {
+      setPersons(initialrecords);
     });
   }, []);
+
   console.log("render", persons.length, "persons");
   const handleNameChange = (event) => {
     setNewName(event.target.value);
@@ -30,6 +31,23 @@ const App = () => {
     setFilter(event.target.value);
   };
 
+  // const addPerson2 = (event) => {
+  //   event.preventDefault();
+  //   // Check if a person with the same name already exists
+  //   if (persons.some((person) => person.name === newName)) {
+  //     alert(`${newName} is already in the phonebook. Not allowed.`);
+  //   } else {
+  //     const personObj = {
+  //       name: newName,
+  //       number: newNumber,
+  //     };
+
+  //     setPersons(persons.concat(personObj));
+  //     setNewName("");
+  //     setNewNumber("");
+  //   }
+  // };
+
   const addPerson2 = (event) => {
     event.preventDefault();
     // Check if a person with the same name already exists
@@ -41,9 +59,11 @@ const App = () => {
         number: newNumber,
       };
 
-      setPersons(persons.concat(personObj));
-      setNewName("");
-      setNewNumber("");
+      phoneBookService.create(personObj).then((returnedPhoneRecord) => {
+        setPersons(persons.concat(returnedPhoneRecord));
+        setNewName("");
+        setNewNumber("");
+      });
     }
   };
 
