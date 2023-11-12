@@ -29,12 +29,51 @@ const App = () => {
     setFilter(event.target.value);
   };
 
+  // const addPerson2 = (event) => {
+  //   event.preventDefault();
+  //   // Check if a person with the same name already exists
+  //   if (persons.some((person) => person.name === newName)) {
+  //     alert(`${newName} is already in the phonebook. Not allowed.`);
+
+  //   } else {
+  //     const personObj = {
+  //       name: newName,
+  //       number: newNumber,
+  //     };
+
+  //     phoneBookService.create(personObj).then((returnedPhoneRecord) => {
+  //       setPersons(persons.concat(returnedPhoneRecord));
+  //       setNewName("");
+  //       setNewNumber("");
+  //     });
+  //   }
+  // };
   const addPerson2 = (event) => {
     event.preventDefault();
+
     // Check if a person with the same name already exists
-    if (persons.some((person) => person.name === newName)) {
-      alert(`${newName} is already in the phonebook. Not allowed.`);
+    const existingPerson = persons.find((person) => person.name === newName);
+
+    if (existingPerson) {
+      // If a person with the same name exists, update their number
+      const updatedPerson = { ...existingPerson, number: newNumber };
+      window.confirm(
+        `${updatedPerson.name} is already added to phonebook, replace old number with new one?`
+      );
+      phoneBookService
+        .update(existingPerson.id, updatedPerson)
+        .then((updatedPhoneRecord) => {
+          setPersons(
+            persons.map((person) =>
+              person.id === updatedPhoneRecord.id ? updatedPhoneRecord : person
+            )
+          );
+        })
+        .catch((error) => {
+          console.log("Error updating entry:", error);
+        });
     } else {
+      // If no person with the same name exists, create a new entry
       const personObj = {
         name: newName,
         number: newNumber,
@@ -42,10 +81,11 @@ const App = () => {
 
       phoneBookService.create(personObj).then((returnedPhoneRecord) => {
         setPersons(persons.concat(returnedPhoneRecord));
-        setNewName("");
-        setNewNumber("");
       });
     }
+
+    setNewName("");
+    setNewNumber("");
   };
 
   // Filter the list of persons based on the filter input
