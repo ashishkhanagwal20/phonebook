@@ -4,12 +4,13 @@ import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
 import Persons from "./components/Persons";
 import phoneBookService from "./services/phoneBookService";
-
+import Notification from "./components/Notification";
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [filter, setFilter] = useState("");
+  const [notification, setNotification] = useState("");
 
   useEffect(() => {
     phoneBookService.getAll().then((initialrecords) => {
@@ -72,6 +73,11 @@ const App = () => {
         .catch((error) => {
           console.log("Error updating entry:", error);
         });
+
+      setNotification(`${updatedPerson.name} is added to phonebook`);
+      setTimeout(() => {
+        setNotification(null);
+      }, 5000);
     } else {
       // If no person with the same name exists, create a new entry
       const personObj = {
@@ -82,6 +88,11 @@ const App = () => {
       phoneBookService.create(personObj).then((returnedPhoneRecord) => {
         setPersons(persons.concat(returnedPhoneRecord));
       });
+
+      setNotification(`${personObj.name} is added to phonebook`);
+      setTimeout(() => {
+        setNotification(null);
+      }, 5000);
     }
 
     setNewName("");
@@ -111,6 +122,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={notification} />
       <Filter filter={filter} handleFilterChange={handleFilterChange} />
       <h2>Add a new</h2>
       <PersonForm
